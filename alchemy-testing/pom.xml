@@ -21,6 +21,11 @@
     </dependency>
     <dependency>
       <groupId>com.rtr.alchemy</groupId>
+      <artifactId>alchemy-identity</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.rtr.alchemy</groupId>
       <artifactId>alchemy-api</artifactId>
       <version>${project.version}</version>
     </dependency>

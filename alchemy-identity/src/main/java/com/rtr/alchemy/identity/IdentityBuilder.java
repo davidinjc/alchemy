@@ -1,4 +1,4 @@
-package com.rtr.alchemy.identities;
+package com.rtr.alchemy.identity;
 
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;

@@ -30,6 +30,11 @@
     </dependency>
     <dependency>
       <groupId>com.rtr.alchemy</groupId>
+      <artifactId>alchemy-identity</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.rtr.alchemy</groupId>
       <artifactId>alchemy-db-mongo</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -40,12 +45,22 @@
     </dependency>
     <dependency>
       <groupId>com.rtr.alchemy</groupId>
+      <artifactId>alchemy-transmute</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>com.rtr.alchemy</groupId>
       <artifactId>alchemy-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-jsonSchema</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>

@@ -1,0 +1,29 @@
+package ${packageName};
+
+#set($dtoArgs = "")
+#foreach($getter in $dtoCtorArgs)
+    #if($foreach.count > 1)
+        #set($dtoArgs = $dtoArgs + ", ")
+    #end
+    #set($dtoArgs = $dtoArgs + "source.$getter()")
+#end
+#set($boArgs = "")
+#foreach($getter in $boCtorArgs)
+    #if($foreach.count > 1)
+        #set($boArgs = $boArgs + ", ")
+    #end
+    #set($boArgs = $boArgs + "source.$getter()")
+#end
+
+@javax.annotation.Generated("$generatedMessage")
+public class ${className}Mapper implements com.rtr.alchemy.mapping.Mapper<$dtoType, $boType> {
+    @java.lang.Override
+    public $boType fromDto($dtoType source) {
+        return new $boType($boArgs);
+    }
+
+    @java.lang.Override
+    public $dtoType toDto($boType source) {
+        return new $dtoType($dtoArgs);
+    }
+}

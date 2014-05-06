@@ -1,20 +1,21 @@
 package com.rtr.alchemy.service.resources;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.inject.util.Types;
 import com.rtr.alchemy.db.memory.MemoryDatabaseProvider;
-import com.rtr.alchemy.dto.identities.IdentityDto;
-import com.rtr.alchemy.identities.Identity;
-import com.rtr.alchemy.identities.IdentityType;
-import com.rtr.alchemy.mapping.Mapper;
 import com.rtr.alchemy.mapping.Mappers;
 import com.rtr.alchemy.models.Experiment;
 import com.rtr.alchemy.models.Experiments;
 import com.rtr.alchemy.service.mapping.CoreMappings;
+import com.rtr.alchemy.service.models.Device;
+import com.rtr.alchemy.service.models.DeviceDto;
+import com.rtr.alchemy.service.models.DeviceMapper;
+import com.rtr.alchemy.service.models.User;
+import com.rtr.alchemy.service.models.UserDto;
+import com.rtr.alchemy.service.models.UserMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
@@ -170,86 +171,6 @@ public abstract class ResourceTest {
 
     protected static Experiment experiment(String name) {
         return EXPERIMENTS.get(name);
-    }
-
-    @IdentityType("user")
-    protected static class User extends Identity {
-        private final String name;
-
-        public User(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public long getHash(int seed) {
-            return identity(seed).putString(name).hash();
-        }
-    }
-
-    @JsonTypeName("user")
-    public abstract static class UserDto extends IdentityDto {
-        public abstract String getName();
-    }
-
-    private static class UserMapper implements Mapper<UserDto, User> {
-        @Override
-        public UserDto toDto(final User source) {
-            return new UserDto() {
-                @Override
-                public String getName() {
-                    return source.getName();
-                }
-            };
-        }
-
-        @Override
-        public User fromDto(UserDto source) {
-            return new User(source.getName());
-        }
-    }
-
-    @IdentityType("device")
-    protected static class Device extends Identity {
-        private final String id;
-
-        public Device(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        @Override
-        public long getHash(int seed) {
-            return identity(seed).putString(id).hash();
-        }
-    }
-
-    @JsonTypeName("device")
-    public abstract static class DeviceDto extends IdentityDto {
-        public abstract String getId();
-    }
-
-    private static class DeviceMapper implements Mapper<DeviceDto, Device> {
-        @Override
-        public DeviceDto toDto(final Device source) {
-            return new DeviceDto() {
-                @Override
-                public String getId() {
-                    return source.getId();
-                }
-            };
-        }
-
-        @Override
-        public Device fromDto(DeviceDto source) {
-            return new Device(source.getId());
-        }
     }
 
     private ResourceAssertion assertion(ClientResponse response) {

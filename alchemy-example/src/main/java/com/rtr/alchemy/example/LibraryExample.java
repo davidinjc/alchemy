@@ -79,7 +79,7 @@ public class LibraryExample {
             .save();
 
         // Let's print out our allocations
-        for (Allocation allocation : experiment.getAllocations()) {
+        for (final Allocation allocation : experiment.getAllocations()) {
             println(
                 "treatment: %s, offset: %d, size: %d",
                 allocation.getTreatment().getName(),
@@ -126,7 +126,7 @@ public class LibraryExample {
         println("name: %s, description: %s", activeTreatment.getName(), activeTreatment.getDescription());
         println();
 
-        for (Map.Entry<Experiment, Treatment> entry : experiments.getActiveTreatments(new User("qa")).entrySet()) {
+        for (final Map.Entry<Experiment, Treatment> entry : experiments.getActiveTreatments(new User("qa")).entrySet()) {
             println(
                 "experiment: %s, treatment: %s, description: %s",
                 entry.getKey().getName(),

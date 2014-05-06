@@ -1,4 +1,4 @@
-package com.rtr.alchemy.identities;
+package com.rtr.alchemy.identity;
 
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.junit.Test;

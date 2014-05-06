@@ -1,7 +1,5 @@
 identities:
-  com.rtr.alchemy.client.identities.User:
-    dto: com.rtr.alchemy.client.dto.UserDto
-    mapper: com.rtr.alchemy.client.mappers.UserMapper
+  - com.rtr.alchemy.client.identities.User
 
 provider:
   type: com.rtr.alchemy.client.providers.MemoryDatabaseConfiguration

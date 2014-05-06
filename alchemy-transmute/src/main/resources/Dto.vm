@@ -1,0 +1,37 @@
+package ${packageName};
+
+@javax.annotation.Generated("$generatedMessage")
+@com.fasterxml.jackson.annotation.JsonTypeName("$identityType")
+public class ${className}Dto extends com.rtr.alchemy.dto.identities.IdentityDto {
+## fields
+#foreach($field in $fields.keySet())
+    #set($type = $fields.get($field))
+    private final $type $field;
+#end
+## generate constructor args
+#set($args = "")
+#foreach($field in $fields.keySet())
+    #set($type = $fields.get($field))
+    #if($foreach.count > 1)
+        #set($args = $args + ", ")
+    #end
+    #set($args = $args + "@com.fasterxml.jackson.annotation.JsonProperty(" + '"' + $field + '"' + ") $type $field")
+#end
+
+## constructor
+    @com.fasterxml.jackson.annotation.JsonCreator
+    public ${className}Dto($args) {
+#foreach($field in $fields.keySet())
+        this.$field = $field;
+#end
+    }
+
+## getters
+#foreach($field in $getters.keySet())
+    #set($type = $fields.get($field))
+    #set($getter = $getters.get($field))
+    public $type $getter() {
+        return $field;
+    }
+#end
+}

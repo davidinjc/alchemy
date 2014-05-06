@@ -3,6 +3,7 @@ package com.rtr.alchemy.service.resources;
 import com.rtr.alchemy.dto.identities.IdentityDto;
 import com.rtr.alchemy.dto.models.TreatmentOverrideDto;
 import com.rtr.alchemy.dto.requests.TreatmentOverrideRequest;
+import com.rtr.alchemy.service.models.UserDto;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response.Status;
@@ -64,12 +65,7 @@ public class TreatmentOverridesResourceTest extends ResourceTest {
 
             @Override
             public IdentityDto getIdentity() {
-                return new UserDto() {
-                    @Override
-                    public String getName() {
-                        return "qa";
-                    }
-                };
+                return new UserDto("qa");
             }
 
             @Override

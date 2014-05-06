@@ -5,7 +5,6 @@ import com.rtr.alchemy.dto.models.TreatmentDto;
 import com.rtr.alchemy.mapping.Mappers;
 import com.rtr.alchemy.models.Experiment;
 import com.rtr.alchemy.models.Experiments;
-import com.rtr.alchemy.models.Treatment;
 
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;

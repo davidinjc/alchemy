@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.rtr.alchemy.dto.identities.IdentityDto;
 import com.rtr.alchemy.dto.models.TreatmentDto;
-import com.rtr.alchemy.identities.Identity;
+import com.rtr.alchemy.identity.Identity;
 import com.rtr.alchemy.mapping.Mappers;
 import com.rtr.alchemy.models.Experiment;
 import com.rtr.alchemy.models.Experiments;
@@ -59,7 +59,7 @@ public class ActiveTreatmentsResource extends BaseResource {
             identitiesList.toArray(new Identity[identitiesList.size()])
         );
 
-        for (Map.Entry<Experiment, Treatment> entry : activeTreatments.entrySet()) {
+        for (final Map.Entry<Experiment, Treatment> entry : activeTreatments.entrySet()) {
             treatments.put(entry.getKey().getName(), mapper.toDto(entry.getValue(), TreatmentDto.class));
         }
 

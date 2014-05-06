@@ -1,7 +1,7 @@
 package com.rtr.alchemy.example.identities;
 
-import com.rtr.alchemy.identities.Identity;
-import com.rtr.alchemy.identities.IdentityType;
+import com.rtr.alchemy.identity.Identity;
+import com.rtr.alchemy.identity.IdentityType;
 
 @IdentityType("user")
 public class User extends Identity {

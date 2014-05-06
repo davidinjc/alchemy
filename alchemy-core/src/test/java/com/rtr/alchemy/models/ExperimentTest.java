@@ -3,7 +3,7 @@ package com.rtr.alchemy.models;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.rtr.alchemy.db.ExperimentsStore;
-import com.rtr.alchemy.identities.Identity;
+import com.rtr.alchemy.identity.Identity;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;

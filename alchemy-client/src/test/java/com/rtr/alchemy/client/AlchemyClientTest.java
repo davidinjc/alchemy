@@ -1,7 +1,7 @@
 package com.rtr.alchemy.client;
 
 import com.google.common.collect.Sets;
-import com.rtr.alchemy.client.dto.UserDto;
+import com.rtr.alchemy.client.identities.UserDto;
 import com.rtr.alchemy.dto.identities.IdentityDto;
 import com.rtr.alchemy.dto.models.AllocationDto;
 import com.rtr.alchemy.dto.models.ExperimentDto;

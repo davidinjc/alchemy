@@ -6,7 +6,7 @@ import com.rtr.alchemy.db.ExperimentsCache;
 import com.rtr.alchemy.db.ExperimentsDatabaseProvider;
 import com.rtr.alchemy.db.ExperimentsStore;
 import com.rtr.alchemy.db.Filter;
-import com.rtr.alchemy.identities.Identity;
+import com.rtr.alchemy.identity.Identity;
 
 import java.util.Map;
 

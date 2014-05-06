@@ -9,7 +9,7 @@ import com.rtr.alchemy.dto.requests.AllocateRequest;
 import com.rtr.alchemy.dto.requests.CreateExperimentRequest;
 import com.rtr.alchemy.dto.requests.TreatmentOverrideRequest;
 import com.rtr.alchemy.dto.requests.UpdateExperimentRequest;
-import com.rtr.alchemy.identities.Identity;
+import com.rtr.alchemy.identity.Identity;
 import com.rtr.alchemy.mapping.Mappers;
 import com.rtr.alchemy.models.Experiment;
 import com.rtr.alchemy.models.Experiments;

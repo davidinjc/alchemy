@@ -9,7 +9,7 @@ import com.rtr.alchemy.dto.models.AllocationDto;
 import com.rtr.alchemy.dto.models.ExperimentDto;
 import com.rtr.alchemy.dto.models.TreatmentDto;
 import com.rtr.alchemy.dto.models.TreatmentOverrideDto;
-import com.rtr.alchemy.example.dto.UserDto;
+import com.rtr.alchemy.example.identities.UserDto;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
@@ -100,7 +100,7 @@ public class ClientExample {
                 .apply();
 
             // Let's print out our allocations
-            for (AllocationDto allocation : client.getAllocations("my_experiment")) {
+            for (final AllocationDto allocation : client.getAllocations("my_experiment")) {
                 println("treatment: %s, offset: %d, size: %d", allocation.getTreatment(), allocation.getOffset(), allocation.getSize());
             }
             println();
@@ -144,7 +144,7 @@ public class ClientExample {
             println("name: %s, description: %s", activeTreatment.getName(), activeTreatment.getDescription());
             println();
 
-            for (Map.Entry<String, TreatmentDto> entry : client.getActiveTreatments(new UserDto("qa")).entrySet()) {
+            for (final Map.Entry<String, TreatmentDto> entry : client.getActiveTreatments(new UserDto("qa")).entrySet()) {
                 println(
                     "experiment: %s, treatment: %s, description: %s",
                     entry.getKey(),
@@ -167,7 +167,7 @@ public class ClientExample {
             // Let's nuke it and call it a day
             client.deleteExperiment("my_experiment");
 
-        } catch (UniformInterfaceException uie) {
+        } catch (final UniformInterfaceException uie) {
             println("ERROR, HTTP %d: %s", uie.getResponse().getStatus(), uie.getResponse().getEntity(String.class));
         }
     }

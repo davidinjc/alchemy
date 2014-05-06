@@ -60,7 +60,17 @@ New identities can be implemented as needed.  You only need to extend the Identi
 It is recommended that the built-in hash builder be used by calling ``identity()`` with the seed value and then specifying the individual fields to be used to generate the hash.  If your identity contains an object reference to another class, you can have it implement Identity as well, and add it to the hash builder to propagate building the hash down the object hierarchy.  The current implementation of the hash builder uses mumur_128 to ensure good distribution and few collisions.
 The ``@IdentityType`` annotation is used to identify which experiments are intended for this identity type.
 
-If you wish to also make the Identity usable from Alchemy Service, you will need to implement a matching DTO and a mapper.  To implement the DTO, simple extend from IdentityDTO:
+If you wish to also make the Identity usable from Alchemy Service, additional restrictions are imposed on your identity class.  This is because a DTO and mapper will be generated from your identity class for you:
+1. Your class must be public, non-abstract and reside in a package
+2. Your class must contain a single public constructor that takes for arguments all field values you wish to use.
+3. Given #2, we recommend you make your identity class immutable, as the DTO will also be immutable
+4. Any getters with @Override will be ignored
+5. Any getters with arguments will be ignored
+6. Any non-public getters will be ignored
+7. Any getters that don't fit the naming convention (is|has|get)Name will be ignored
+8. Your identity can only contain types that can be serialized and deserialized by default by Jackson
+
+In order to generate DTO and mapper, you only need to a maven dependency for the alchemy-transmute module.  You may need to include 'target/generated-sources/annotation' as a source root in your IDE of choice to avoid syntax errors being displayed.
 
 .. code-block:: java
 

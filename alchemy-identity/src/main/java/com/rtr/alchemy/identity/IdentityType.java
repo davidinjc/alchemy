@@ -1,4 +1,4 @@
-package com.rtr.alchemy.identities;
+package com.rtr.alchemy.identity;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

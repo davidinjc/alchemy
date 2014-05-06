@@ -13,6 +13,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.rtr.alchemy</groupId>
+      <artifactId>alchemy-identity</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
@@ -31,10 +36,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-math3</artifactId>
     </dependency>
   </dependencies>
 </project>
