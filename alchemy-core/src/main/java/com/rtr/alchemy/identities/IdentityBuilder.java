@@ -11,14 +11,14 @@ import java.nio.charset.Charset;
 public class IdentityBuilder {
     private static final Charset CHARSET = Charset.forName("UTF-8");
     private final Hasher hasher;
-    private final int seed;
+    private final long seed;
 
-    private IdentityBuilder(int seed) {
-        this.hasher = Hashing.murmur3_128(seed).newHasher();
+    private IdentityBuilder(long seed) {
+        this.hasher = Hashing.murmur3_128((int) seed).newHasher();
         this.seed = seed;
     }
 
-    public static IdentityBuilder seed(int seed) {
+    public static IdentityBuilder seed(long seed) {
         return new IdentityBuilder(seed);
     }
 

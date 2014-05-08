@@ -2,7 +2,7 @@ package com.rtr.alchemy.service.health;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.inject.Inject;
-import com.rtr.alchemy.db.Filter;
+import com.rtr.alchemy.db.Query;
 import com.rtr.alchemy.models.Experiments;
 
 public class ExperimentsDatabaseProviderCheck extends HealthCheck {
@@ -15,7 +15,7 @@ public class ExperimentsDatabaseProviderCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        experiments.find(Filter.criteria().limit(1).build());
+        experiments.find(Query.criteria().limit(1).build());
         experiments.getActiveTreatments();
         return Result.healthy();
     }

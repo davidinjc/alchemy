@@ -2,11 +2,13 @@ package com.rtr.alchemy.db;
 
 import com.rtr.alchemy.models.Experiment;
 
+import java.io.Closeable;
+
 /**
  * An interface for defining basic CRUD operations around experiments, treatments and allocations.  These operations do
  * not need to be highly optimized or fast
  */
-public interface ExperimentsStore {
+public interface ExperimentsStore extends Closeable {
     /**
      * Save an experiment, creating or updating it
      * @param experiment The experiment to create or update
@@ -29,13 +31,26 @@ public interface ExperimentsStore {
 
     /**
      * Finds experiments with given criteria
-     * @param filter Criteria for pagination and filtering
+     * @param query Criteria for pagination and filtering
+     * @param factory a builder factory for creating new instances of Experiment
      * @return Filtered list of experiments
      */
-    Iterable<Experiment> find(Filter filter);
+    Iterable<Experiment> find(Query query, Experiment.BuilderFactory factory);
 
     /**
-     * Disposes any resources this object may be using
+     * Requests a unique sequence number for an experiment, which must always increment.  This is used
+     * for versioning for caching
      */
-    void close();
+    long nextSequenceNumber();
+
+    /**
+     * Retrieves the last generated sequence number or null if no sequence number has been generated yet
+     */
+    Long currentSequenceNumber();
+
+    /**
+     * Retrieves sequence number for a given experiment
+     * @return the sequence number or null if experiment does not exist
+     */
+    Long sequenceNumber(String experimentName);
 }

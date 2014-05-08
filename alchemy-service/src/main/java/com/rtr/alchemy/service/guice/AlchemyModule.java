@@ -44,7 +44,10 @@ public class AlchemyModule extends AbstractModule {
         final Mappers mappers = buildMappers();
         bind(Mappers.class).toInstance(mappers);
 
-        final Experiments experiments = new Experiments(configuration.getProvider().createProvider());
+        final Experiments experiments =
+            Experiments
+                .using(configuration.getStore().createStore())
+                .build();
         bind(Experiments.class).toInstance(experiments);
     }
 

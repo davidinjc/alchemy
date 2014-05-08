@@ -27,8 +27,8 @@ public class AlchemyServiceConfiguration extends Configuration {
 
     @JsonProperty
     @NotNull
-    private final DatabaseProviderConfiguration provider = null;
-    public DatabaseProviderConfiguration getProvider() {
-        return provider;
+    private final ExperimentsStoreConfiguration store = null;
+    public ExperimentsStoreConfiguration getStore() {
+        return store;
     }
 }

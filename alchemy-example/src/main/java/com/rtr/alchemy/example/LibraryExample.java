@@ -3,8 +3,7 @@ package com.rtr.alchemy.example;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.google.common.collect.Iterables;
-import com.rtr.alchemy.db.ExperimentsDatabaseProvider;
-import com.rtr.alchemy.db.memory.MemoryDatabaseProvider;
+import com.rtr.alchemy.db.memory.MemoryExperimentsStore;
 import com.rtr.alchemy.example.identities.User;
 import com.rtr.alchemy.models.Allocation;
 import com.rtr.alchemy.models.Experiment;
@@ -35,8 +34,8 @@ public class LibraryExample {
     public static void main(String[] args) {
         disableLogging();
 
-        final ExperimentsDatabaseProvider provider = new MemoryDatabaseProvider();
-        final Experiments experiments = new Experiments(provider);
+        final MemoryExperimentsStore store = new MemoryExperimentsStore();
+        final Experiments experiments = Experiments.using(store).build();
 
         // Let's create our experiment
         experiments
@@ -79,7 +78,7 @@ public class LibraryExample {
             .save();
 
         // Let's print out our allocations
-        for (Allocation allocation : experiment.getAllocations()) {
+        for (final Allocation allocation : experiment.getAllocations()) {
             println(
                 "treatment: %s, offset: %d, size: %d",
                 allocation.getTreatment().getName(),
@@ -126,7 +125,7 @@ public class LibraryExample {
         println("name: %s, description: %s", activeTreatment.getName(), activeTreatment.getDescription());
         println();
 
-        for (Map.Entry<Experiment, Treatment> entry : experiments.getActiveTreatments(new User("qa")).entrySet()) {
+        for (final Map.Entry<Experiment, Treatment> entry : experiments.getActiveTreatments(new User("qa")).entrySet()) {
             println(
                 "experiment: %s, treatment: %s, description: %s",
                 entry.getKey().getName(),

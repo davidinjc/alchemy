@@ -1,12 +1,12 @@
 package com.rtr.alchemy.example.provider;
 
-import com.rtr.alchemy.db.ExperimentsDatabaseProvider;
-import com.rtr.alchemy.db.memory.MemoryDatabaseProvider;
-import com.rtr.alchemy.service.config.DatabaseProviderConfiguration;
+import com.rtr.alchemy.db.ExperimentsStore;
+import com.rtr.alchemy.db.memory.MemoryExperimentsStore;
+import com.rtr.alchemy.service.config.ExperimentsStoreConfiguration;
 
-public class MemoryDatabaseConfiguration extends DatabaseProviderConfiguration {
+public class MemoryDatabaseConfiguration extends ExperimentsStoreConfiguration {
     @Override
-    public ExperimentsDatabaseProvider createProvider() {
-        return new MemoryDatabaseProvider();
+    public ExperimentsStore createStore() {
+        return new MemoryExperimentsStore();
     }
 }

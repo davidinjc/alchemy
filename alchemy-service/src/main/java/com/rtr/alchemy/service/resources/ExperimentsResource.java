@@ -2,7 +2,7 @@ package com.rtr.alchemy.service.resources;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import com.rtr.alchemy.db.Filter;
+import com.rtr.alchemy.db.Query;
 import com.rtr.alchemy.dto.models.ExperimentDto;
 import com.rtr.alchemy.dto.models.TreatmentDto;
 import com.rtr.alchemy.dto.requests.AllocateRequest;
@@ -14,6 +14,7 @@ import com.rtr.alchemy.mapping.Mappers;
 import com.rtr.alchemy.models.Experiment;
 import com.rtr.alchemy.models.Experiments;
 import com.rtr.alchemy.models.Treatment;
+import com.rtr.alchemy.service.util.QueryUtil;
 
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -24,9 +25,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.Set;
 
 @Path("/experiments")
@@ -43,20 +45,9 @@ public class ExperimentsResource extends BaseResource {
     }
 
     @GET
-    public Iterable<ExperimentDto> getExperiments(@QueryParam("filter") String filterValue,
-                                                  @QueryParam("offset") Integer offset,
-                                                  @QueryParam("limit") Integer limit) {
-        return mapper.toDto(
-            experiments.find(
-                Filter
-                    .criteria()
-                    .filter(filterValue)
-                    .offset(offset)
-                    .limit(limit)
-                    .build()
-            ),
-            ExperimentDto.class
-        );
+    public Iterable<ExperimentDto> getExperiments(@Context UriInfo uriInfo) {
+        final Query query = QueryUtil.buildQuery(uriInfo.getQueryParameters());
+        return mapper.toDto(experiments.find(query), ExperimentDto.class);
     }
 
     @PUT
@@ -68,19 +59,19 @@ public class ExperimentsResource extends BaseResource {
                 .setIdentityType(request.getIdentityType());
 
         if (request.getTreatments() != null) {
-            for (TreatmentDto treatment : request.getTreatments()) {
+            for (final TreatmentDto treatment : request.getTreatments()) {
                 experiment.addTreatment(treatment.getName(), treatment.getDescription());
             }
         }
 
         if (request.getAllocations() != null) {
-            for (AllocateRequest allocation : request.getAllocations()) {
+            for (final AllocateRequest allocation : request.getAllocations()) {
                 experiment.allocate(allocation.getTreatment(), allocation.getSize());
             }
         }
 
         if (request.getOverrides() != null) {
-            for (TreatmentOverrideRequest override : request.getOverrides()) {
+            for (final TreatmentOverrideRequest override : request.getOverrides()) {
                 final Identity identity = mapper.fromDto(override.getIdentity(), Identity.class);
                 experiment.addOverride(override.getName(), override.getTreatment(), identity);
             }
@@ -116,12 +107,12 @@ public class ExperimentsResource extends BaseResource {
         // only remove treatments not present in request, otherwise we wipe out existing allocations
         if (request.getTreatments() != null) {
             final Set<String> missingTreatments = Sets.newHashSet();
-            for (Treatment treatment : experiment.getTreatments()) {
+            for (final Treatment treatment : experiment.getTreatments()) {
                 missingTreatments.add(treatment.getName());
             }
 
             if (request.getTreatments().isPresent()) {
-                for (TreatmentDto treatment : request.getTreatments().get()) {
+                for (final TreatmentDto treatment : request.getTreatments().get()) {
                     missingTreatments.remove(treatment.getName());
                     final Treatment existingTreatment = experiment.getTreatment(treatment.getName());
 
@@ -133,7 +124,7 @@ public class ExperimentsResource extends BaseResource {
                 }
             }
 
-            for (String missingTreatment : missingTreatments) {
+            for (final String missingTreatment : missingTreatments) {
                 experiment.removeTreatment(missingTreatment);
             }
         }
@@ -142,7 +133,7 @@ public class ExperimentsResource extends BaseResource {
             experiment.deallocateAll();
 
             if (request.getAllocations().isPresent()) {
-                for (AllocateRequest allocation : request.getAllocations().get()) {
+                for (final AllocateRequest allocation : request.getAllocations().get()) {
                     experiment.allocate(allocation.getTreatment(), allocation.getSize());
                 }
             }
@@ -152,7 +143,7 @@ public class ExperimentsResource extends BaseResource {
             experiment.clearOverrides();
 
             if (request.getOverrides().isPresent()) {
-                for (TreatmentOverrideRequest override : request.getOverrides().get()) {
+                for (final TreatmentOverrideRequest override : request.getOverrides().get()) {
                     experiment.addOverride(
                         override.getName(),
                         override.getTreatment(),

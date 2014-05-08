@@ -2,65 +2,21 @@ package com.rtr.alchemy.db;
 
 import com.google.common.base.Objects;
 
-/**
- * Filter criteria for a list query, allowing for pagination and filtering of items
- */
 public class Filter {
-    public static final Filter NONE = Filter.criteria().build();
-    private final String filter;
-    private final Integer offset;
-    private final Integer limit;
+    private final FilterableFields field;
+    private final Object value;
 
-    private Filter(String filter, Integer offset, Integer limit) {
-        this.filter = filter;
-        this.offset = offset;
-        this.limit = limit;
+    public Filter(FilterableFields field, Object value) {
+        this.field = field;
+        this.value = value;
     }
 
-    public static Builder criteria() {
-        return new Builder();
+    public FilterableFields getField() {
+        return field;
     }
 
-    public static class Builder {
-        private String filter;
-        private Integer offset;
-        private Integer limit;
-
-        public Builder filter(String filter) {
-            this.filter = filter;
-            return this;
-        }
-
-        public Builder offset(Integer offset) {
-            this.offset = offset;
-            return this;
-        }
-
-        public Builder limit(Integer limit) {
-            this.limit = limit;
-            return this;
-        }
-
-        public Filter build() {
-            return new Filter(filter, offset, limit);
-        }
-    }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public Integer getOffset() {
-        return offset;
-    }
-
-    public Integer getLimit() {
-        return limit;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(filter, offset, limit);
+    public Object getValue() {
+        return value;
     }
 
     @Override
@@ -70,22 +26,13 @@ public class Filter {
         }
 
         final Filter other = (Filter) obj;
-
         return
-            Objects.equal(filter, other.filter) &&
-            Objects.equal(offset, other.offset) &&
-            Objects.equal(limit, other.limit);
-
+            Objects.equal(field, other.field) &&
+            Objects.equal(value, other.value);
     }
 
     @Override
-    public String toString() {
-        return
-            Objects
-                .toStringHelper(this)
-                .add("filter", filter)
-                .add("offset", offset)
-                .add("limit", limit)
-                .toString();
+    public int hashCode() {
+        return Objects.hashCode(field, value);
     }
 }

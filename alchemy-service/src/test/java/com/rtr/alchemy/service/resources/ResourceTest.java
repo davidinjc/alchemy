@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.inject.util.Types;
-import com.rtr.alchemy.db.memory.MemoryDatabaseProvider;
+import com.rtr.alchemy.db.memory.MemoryExperimentsStore;
 import com.rtr.alchemy.dto.identities.IdentityDto;
 import com.rtr.alchemy.identities.Identity;
 import com.rtr.alchemy.identities.IdentityType;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 public abstract class ResourceTest {
-    private static final MemoryDatabaseProvider PROVIDER;
+    private static final MemoryExperimentsStore STORE;
     protected static final Experiments EXPERIMENTS;
     protected static final Mappers MAPPER;
     protected static final String EXPERIMENT_1 = "pie_vs_cake";
@@ -71,8 +71,8 @@ public abstract class ResourceTest {
     public static final ResourceTestRule RESOURCES;
 
     static {
-        PROVIDER = new MemoryDatabaseProvider();
-        EXPERIMENTS = spy(new Experiments(PROVIDER));
+        STORE = new MemoryExperimentsStore();
+        EXPERIMENTS = spy(Experiments.using(STORE).build());
         MAPPER = new Mappers();
         MAPPER.register(UserDto.class, User.class, new UserMapper());
         MAPPER.register(DeviceDto.class, Device.class, new DeviceMapper());
@@ -101,7 +101,7 @@ public abstract class ResourceTest {
 
     @Before
     public void setUp() {
-        PROVIDER.resetDatabase();
+        STORE.resetDatabase();
 
         EXPERIMENTS
             .create(EXPERIMENT_1)
@@ -196,7 +196,7 @@ public abstract class ResourceTest {
         }
 
         @Override
-        public long getHash(int seed) {
+        public long getHash(long seed) {
             return identity(seed).putString(name).hash();
         }
     }
@@ -236,7 +236,7 @@ public abstract class ResourceTest {
         }
 
         @Override
-        public long getHash(int seed) {
+        public long getHash(long seed) {
             return identity(seed).putString(id).hash();
         }
     }
