@@ -16,7 +16,7 @@ public class User extends Identity {
     }
 
     @Override
-    public long getHash(int seed) {
+    public long getHash(long seed) {
         return identity(seed)
             .putString(name)
             .hash();

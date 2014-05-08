@@ -1,38 +1,34 @@
 package com.rtr.alchemy.db.memory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.rtr.alchemy.db.ExperimentsStore;
 import com.rtr.alchemy.db.Filter;
 import com.rtr.alchemy.models.Experiment;
-
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MemoryExperimentsStore implements ExperimentsStore {
-    private final MemoryDatabase db;
+    private final Map<String, Experiment> db = Maps.newConcurrentMap();
+    private final AtomicLong sequence = new AtomicLong(Long.MIN_VALUE);
 
-    public MemoryExperimentsStore(MemoryDatabase db) {
-        this.db = db;
+    public MemoryExperimentsStore() {
     }
 
     @Override
     public void save(Experiment experiment) {
-        synchronized (db) {
-            db.getExperiments().put(experiment.getName(), Experiment.copyOf(experiment));
-        }
+        db.put(experiment.getName(), Experiment.copyOf(experiment));
     }
 
     @Override
     public Experiment load(String experimentName, Experiment.Builder builder) {
-        synchronized (db) {
-            return Experiment.copyOf(db.getExperiments().get(experimentName));
-        }
+        return Experiment.copyOf(db.get(experimentName));
     }
 
     @Override
     public void delete(String experimentName) {
-        synchronized (db) {
-            db.getExperiments().remove(experimentName);
-        }
+        db.remove(experimentName);
     }
 
     private static boolean filterMatches(String filter, Object ... values) {
@@ -40,7 +36,7 @@ public class MemoryExperimentsStore implements ExperimentsStore {
             return true;
         }
 
-        for (Object obj : values) {
+        for (final Object obj : values) {
             if (obj == null) {
                 continue;
             }
@@ -55,13 +51,13 @@ public class MemoryExperimentsStore implements ExperimentsStore {
     }
 
     @Override
-    public Iterable<Experiment> find(Filter filter) {
+    public Iterable<Experiment> find(Filter filter, Experiment.BuilderFactory factory) {
         int limit = 0;
         int offset = 0;
         final List<Experiment> result = Lists.newArrayList();
 
         synchronized (db) {
-            for (Experiment experiment : db.getExperiments().values()) {
+            for (final Experiment experiment : db.values()) {
                 if (filter.getOffset() != null && offset++ < filter.getOffset()) {
                     continue;
                 }
@@ -85,6 +81,32 @@ public class MemoryExperimentsStore implements ExperimentsStore {
 
     @Override
     public void close() {
+        db.clear();
+    }
 
+    @Override
+    public long nextSequenceNumber() {
+        return sequence.incrementAndGet();
+    }
+
+    @Override
+    public Long currentSequenceNumber() {
+        final long num = sequence.get();
+
+        if (num == Long.MIN_VALUE) {
+            return null;
+        }
+
+        return num;
+    }
+
+    @Override
+    public Long sequenceNumber(String experimentName) {
+        final Experiment experiment = db.get(experimentName);
+        return experiment != null ? experiment.getSequence() : null;
+    }
+
+    public void resetDatabase() {
+        db.clear();
     }
 }

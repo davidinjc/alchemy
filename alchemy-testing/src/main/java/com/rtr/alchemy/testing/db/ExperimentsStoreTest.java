@@ -1,7 +1,8 @@
 package com.rtr.alchemy.testing.db;
 
 import com.google.common.collect.Iterables;
-import com.rtr.alchemy.db.ExperimentsDatabaseProvider;
+import com.rtr.alchemy.caching.NoOpRefreshStrategy;
+import com.rtr.alchemy.db.ExperimentsStore;
 import com.rtr.alchemy.db.Filter;
 import com.rtr.alchemy.identities.Identity;
 import com.rtr.alchemy.identities.IdentityType;
@@ -22,10 +23,10 @@ import static org.mockito.Mockito.mock;
  * The purpose of this class is to provide a base class for testing whether an implementation of a provider
  * behaves correctly
  */
-public abstract class ExperimentsDatabaseProviderTest {
+public abstract class ExperimentsStoreTest {
     private Experiments experiments;
 
-    protected abstract ExperimentsDatabaseProvider createProvider();
+    protected abstract ExperimentsStore createStore();
 
     @IdentityType("test")
     private static class TestIdentity extends Identity {
@@ -45,7 +46,7 @@ public abstract class ExperimentsDatabaseProviderTest {
         }
 
         @Override
-        public long getHash(int seed) {
+        public long getHash(long seed) {
             return identity(seed)
                 .putString(name)
                 .hash();
@@ -54,9 +55,13 @@ public abstract class ExperimentsDatabaseProviderTest {
 
     @Before
     public void setUp() {
-        final ExperimentsDatabaseProvider provider = createProvider();
-        assertNotNull("provider cannot be null", provider);
-        experiments = new Experiments(provider);
+        final ExperimentsStore store = createStore();
+        assertNotNull("store cannot be null", store);
+        experiments =
+            Experiments
+                .using(store)
+                .using(new NoOpRefreshStrategy())
+                .build();
     }
 
     @Test
@@ -206,6 +211,8 @@ public abstract class ExperimentsDatabaseProviderTest {
             .allocate("control", 100)
             .save();
 
+        experiments.getCache().invalidateAll(false);
+
         assertNull(
             "no active treatment should be returned for deactivated experiment",
             experiments.getActiveTreatment(
@@ -306,14 +313,14 @@ public abstract class ExperimentsDatabaseProviderTest {
             .create("foo")
             .save();
 
-        assertFalse("should have no active experiments", experiments.getActiveExperiments().iterator().hasNext());
+        assertTrue("should have no active experiments", experiments.getCache().getActiveExperiments().isEmpty());
 
         experiments
             .get("foo")
             .activate()
             .save();
 
-        assertTrue("should have an active experiment", experiments.getActiveExperiments().iterator().hasNext());
+        assertFalse("should have an active experiment", experiments.getCache().getActiveExperiments().isEmpty());
     }
 
     @Test
@@ -339,7 +346,7 @@ public abstract class ExperimentsDatabaseProviderTest {
             obj1 == obj3
         );
 
-        final Experiment obj4 = experiments.getActiveExperiments().iterator().next();
+        final Experiment obj4 = experiments.getCache().getActiveExperiments().values().iterator().next();
 
         assertFalse(
             "saved experiment object reference should not be same object reference from getActiveExperiments()",

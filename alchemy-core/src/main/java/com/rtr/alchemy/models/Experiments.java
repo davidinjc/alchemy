@@ -2,29 +2,50 @@ package com.rtr.alchemy.models;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.rtr.alchemy.db.ExperimentsCache;
-import com.rtr.alchemy.db.ExperimentsDatabaseProvider;
+import com.rtr.alchemy.caching.DefaultRefreshStrategy;
+import com.rtr.alchemy.caching.ExperimentsCache;
+import com.rtr.alchemy.caching.RefreshStrategy;
+import com.rtr.alchemy.db.ExperimentsContext;
 import com.rtr.alchemy.db.ExperimentsStore;
 import com.rtr.alchemy.db.Filter;
 import com.rtr.alchemy.identities.Identity;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * The main class for accessing experiments
  */
-public class Experiments {
+public class Experiments implements Closeable {
     private final ExperimentsStore store;
     private final ExperimentsCache cache;
+    private final ExperimentsContext context;
+    private final RefreshStrategy refreshStrategy;
 
-    public Experiments(ExperimentsDatabaseProvider provider) {
-        store = provider.createStore();
-        cache = provider.createCache();
+    private Experiments(ExperimentsStore store,
+                        RefreshStrategy refreshStrategy,
+                        ExecutorService executorService) {
         Preconditions.checkNotNull(store, "store cannot be null");
-        Preconditions.checkNotNull(cache, "cache cannot be null");
+        this.store = store;
+        this.cache = new ExperimentsCache(store, executorService);
+        this.cache.invalidateAll(false);
+        this.refreshStrategy = refreshStrategy != null ? refreshStrategy : new DefaultRefreshStrategy();
+        this.context = new ExperimentsContext(store, cache);
+    }
+
+    public static ExperimentsBuilder using(ExperimentsStore store) {
+        return new ExperimentsBuilder(store);
+    }
+
+    public ExperimentsCache getCache() {
+        return cache;
     }
 
     public synchronized Treatment getActiveTreatment(String experimentName, Identity identity) {
+        refreshStrategy.accessExperiment(experimentName, cache);
+
         final Experiment experiment = cache.getActiveExperiments().get(experimentName);
         if (experiment == null) {
             return null;
@@ -38,20 +59,18 @@ public class Experiments {
         return override != null ? override.getTreatment() : experiment.getTreatment(identity);
     }
 
-    public synchronized Iterable<Experiment> getActiveExperiments() {
-        return cache.getActiveExperiments().values();
-    }
-
     public synchronized Map<Experiment, Treatment> getActiveTreatments(Identity ... identities) {
+        refreshStrategy.accessAll(cache);
+
         final Map<String, Identity> identitiesByType = Maps.newHashMap();
-        for (Identity identity : identities) {
+        for (final Identity identity : identities) {
             identitiesByType.put(identity.getType(), identity);
         }
 
         final Map<Experiment, Treatment> result = Maps.newHashMap();
-        for (Experiment experiment : getActiveExperiments()) {
+        for (final Experiment experiment : cache.getActiveExperiments().values()) {
             if (experiment.getIdentityType() == null) {
-                for (Identity identity : identities) {
+                for (final Identity identity : identities) {
                     final TreatmentOverride override = experiment.getOverride(identity);
                     final Treatment treatment = override == null ? experiment.getTreatment(identity) : override.getTreatment();
 
@@ -81,25 +100,66 @@ public class Experiments {
     }
 
     public synchronized Iterable<Experiment> find(Filter filter) {
-        return store.find(filter);
+        return store.find(filter, new Experiment.BuilderFactory(context));
     }
 
     public synchronized Iterable<Experiment> find() {
-        return store.find(Filter.criteria().build());
+        return find(Filter.criteria().build());
+    }
+
+    public synchronized void save(Experiment experiment) {
+        store.save(experiment);
+
     }
 
     public synchronized Experiment get(String experimentName) {
         return store.load(
             experimentName,
-            new Experiment.Builder(store, experimentName)
+            new Experiment.Builder(context)
         );
     }
 
     public synchronized void delete(String experimentName) {
         store.delete(experimentName);
+        cache.experimentDeleted(experimentName);
     }
 
     public synchronized Experiment create(String name) {
-        return new Experiment(store, name);
+        return new Experiment(context, name);
+    }
+
+    @Override
+    public void close() throws IOException {
+        cache.close();
+        store.close();
+    }
+
+    public static class ExperimentsBuilder {
+        private final ExperimentsStore store;
+        private RefreshStrategy strategy;
+        private ExecutorService executorService;
+
+        private ExperimentsBuilder(ExperimentsStore store) {
+            this.store = store;
+        }
+
+        public ExperimentsBuilder using(RefreshStrategy strategy) {
+            this.strategy = strategy;
+            return this;
+        }
+
+        public ExperimentsBuilder using(ExecutorService executorService) {
+            this.executorService = executorService;
+            return this;
+        }
+
+        public Experiments build() {
+            return new Experiments(
+                store,
+                strategy,
+                executorService
+            );
+        }
+
     }
 }

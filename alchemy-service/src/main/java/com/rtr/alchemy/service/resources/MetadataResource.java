@@ -3,12 +3,14 @@ package com.rtr.alchemy.service.resources;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.rtr.alchemy.service.metadata.IdentitiesMetadata;
 import com.rtr.alchemy.service.metadata.IdentityMetadata;
 import io.dropwizard.setup.Environment;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -33,8 +35,17 @@ public class MetadataResource extends BaseResource {
 
     @GET
     @Path("/identityTypes")
-    public Map<String, Class<?>> getIdentityTypes() {
-        return identityTypesByName;
+    public Map<String, String> getIdentityTypes() {
+        return Maps.transformValues(
+            identityTypesByName,
+            new Function<Class<?>, String>() {
+                @Nullable
+                @Override
+                public String apply(Class<?> input) {
+                    return input.getCanonicalName();
+                }
+            }
+        );
     }
 
     @GET

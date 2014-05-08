@@ -11,5 +11,5 @@ identities:
     dto: com.rtr.alchemy.example.dto.UserDto
     mapper: com.rtr.alchemy.example.mappers.UserMapper
 
-provider:
+store:
   type: com.rtr.alchemy.example.provider.MemoryDatabaseConfiguration

@@ -23,9 +23,9 @@ public abstract class Identity {
         type = typeAnnotation.value();
     }
 
-    public abstract long getHash(int seed);
+    public abstract long getHash(long seed);
 
-    protected IdentityBuilder identity(int seed) {
+    protected IdentityBuilder identity(long seed) {
         return IdentityBuilder.seed(seed);
     }
 
